@@ -1,0 +1,6 @@
+sbatch --array=1-378 \
+/scratch/cqh6wn/Isofemale/mapping_script.sh \
+/standard/BerglandTeach/dest_freeze2.6.1_latest.sif \
+/scratch/cqh6wn/Isofemale/fastq_files \
+/scratch/cqh6wn/Isofemale/mapping_output \
+/scratch/cqh6wn/Isofemale/metadata_successful.csv
