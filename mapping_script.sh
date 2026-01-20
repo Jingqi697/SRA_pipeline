@@ -20,7 +20,6 @@ module load apptainer
 METADATA=$4
 line_num=$((SLURM_ARRAY_TASK_ID + 1))
 
-# Robust parsing to handle quotes/commas and find ALL SRA IDs for this fly
 read -r sampleId srr_list <<< $(python3 -c "
 import csv
 with open('$METADATA', 'r') as f:
@@ -39,12 +38,9 @@ SIF_IMAGE=$1
 # Part 2. Handle File Merging     #
 ###################################
 srr_array=($srr_list)
-
 if [ ${#srr_array[@]} -gt 1 ]; then
-    echo "Multiple SRAs detected for ${sampleId}. Merging files..."
     R1_PATH="${FASTQ_DIR}/${sampleId}_merged_1.fastq.gz"
     R2_PATH="${FASTQ_DIR}/${sampleId}_merged_2.fastq.gz"
-    
     > "$R1_PATH"
     > "$R2_PATH"
     for srr in "${srr_array[@]}"; do
@@ -62,7 +58,10 @@ fi
 ###################################
 mkdir -p ${OUT_DIR}
 
-# If your reads are Paired End use this version
+# KEY FIX: Redirect temp files to your scratch space
+export APPTAINERENV_TMPDIR=/scratch/cqh6wn/Isofemale/tmp
+mkdir -p $APPTAINERENV_TMPDIR
+
 apptainer run \
   --containall \
   --bind /scratch,/project,/standard \
